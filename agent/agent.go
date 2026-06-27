@@ -37,6 +37,12 @@ func Run(cfg *config.AgentConfig) {
 			case nuevaConn := <-canalReconexion:
 				conectado = nuevaConn
 				reconectando = false
+				serverID, err := network.Register(conectado)
+				if err != nil {
+					fmt.Println("Error al registrar el agente:", err)
+					return
+				}
+				fmt.Println("Agente registrado con server_id:", serverID)
 				fmt.Println("Reconectado. Enviando", len(buffer), "métricas pendientes...")
 				for _, pendiente := range buffer {
 					dataPendiente, errMarshal := json.Marshal(pendiente)
