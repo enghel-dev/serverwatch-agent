@@ -43,16 +43,6 @@ serverwatch-agent/
 
 ## Instalación y uso
 
-### Compilar
-
-```bash
-# Linux
-GOOS=linux GOARCH=amd64 go build -o serverwatch-agent
-
-# Windows
-GOOS=windows GOARCH=amd64 go build -o serverwatch-agent.exe
-```
-
 ### Primera ejecución (instalación)
 
 ```bash
@@ -99,7 +89,7 @@ El agente envía:
 
 ```json
 {
-  "hostname": "ENGHEL",
+  "hostname": "Servidor de prueba",
   "ip_address": "192.168.1.130",
   "operating_system": "windows"
 }
@@ -133,19 +123,6 @@ Ruta WebSocket actual: `/ws/metrics` (sin `server_id` en la ruta — el backend 
 
 ---
 
-## Limitaciones conocidas
-
-### ⚠️ Re-registro pendiente tras reconexión
-
-El backend actual **no tiene memoria entre conexiones** — cada conexión WebSocket nueva es tratada como un servidor desconocido hasta que recibe el mensaje de registro, y le asigna un `server_id` nuevo (no recupera el anterior). Esto es consecuencia del modo de auto-registro temporal, sin tokens persistentes (eso está planeado para cuando `api-svc` implemente el flujo real de tokens).
-
-**Estado actual del agente:** la goroutine de reconexión (`agent.go`) reabre la conexión tras una caída de red, pero **no vuelve a enviar el mensaje de registro** en la conexión nueva — solo reenvía el buffer de métricas acumuladas directamente.
-
-**Consecuencia práctica:** en el backend actual, una reconexión real probablemente sea rechazada (o tratada de forma inconsistente) porque el primer mensaje que recibe en la conexión nueva es una métrica, no un registro.
-
-**Pendiente:** llamar a `network.Register(conn)` también dentro de la rama de reconexión exitosa en `agent.Run()`, antes de vaciar el buffer — no solo en la conexión inicial. Se decidió posponer esta corrección para una iteración posterior del proyecto.
-
----
 
 ## Componentes internos
 
