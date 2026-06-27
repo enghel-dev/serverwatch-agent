@@ -19,6 +19,13 @@ func Run(cfg *config.AgentConfig) {
 		return
 	}
 
+	serverID, err := network.Register(conectado)
+	if err != nil {
+		fmt.Println("Error al registrar el agente:", err)
+		return
+	}
+	fmt.Println("Agente registrado con server_id:", serverID)	
+																												
 	var buffer []*collector.Metrics
 	reconectando := false
 	canalReconexion := make(chan *websocket.Conn)
@@ -43,6 +50,7 @@ func Run(cfg *config.AgentConfig) {
 				// todavía no reconecta, seguimos sin bloquear
 			}
 		}
+		
 
 		metricas, err := collector.GetAllMetrics()
 		if err != nil {
